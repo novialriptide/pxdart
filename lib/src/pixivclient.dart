@@ -161,7 +161,6 @@ class PixivClient {
   Future<void> getTrendingIllustTags() async {
     throw UnimplementedError();
   }
-}
 
   Future<void> searchIllust() async {
     // TODO
@@ -227,5 +226,4 @@ class PixivClient {
   Future<void> getShowcaseArticle() async {
     throw UnimplementedError();
   }
-  
 }
