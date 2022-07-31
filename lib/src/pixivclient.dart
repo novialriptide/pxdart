@@ -162,9 +162,64 @@ class PixivClient {
     throw UnimplementedError();
   }
 
-  Future<void> searchIllust() async {
-    // TODO
-    throw UnimplementedError();
+  /*
+
+  Valid `searchTarget`s:
+   - partial_match_for_tags
+   - exact_match_for_tags
+   - title_and_caption
+
+  Valid `sort`s:
+   - date_desc
+   - date_asc
+   - popular_desc
+  
+  Valid `duration`s:
+   - within_last_day
+   - within_last_week
+   - within_last_month
+  
+  Valid `start_date` and `end_date` examples:
+   - `2020-07-01`
+
+  */
+  Future<void> searchIllust(
+    String word, [
+    String searchTarget = "partial_match_for_tags",
+    String sort = "date_desc",
+    String duration = "",
+    String startDate = "",
+    String endDate = "",
+    int offset = 0,
+  ]) async {
+    Map<String, String> header = getHeader();
+    Map<String, String> body = {
+      "word": word,
+      "search_target": searchTarget,
+      "sort": sort,
+      "filter": "for_ios",
+    };
+
+    if (duration.isNotEmpty) {
+      body["duration"] = duration;
+    }
+
+    if (startDate.isNotEmpty) {
+      body["start_date"] = startDate;
+    }
+
+    if (endDate.isNotEmpty) {
+      body["end_date"] = endDate;
+    }
+
+    Uri uri = Uri.https("app-api.pixiv.net", "/v1/search/illust", body);
+    var response = await httpClient.get(uri, headers: header);
+
+    print(response.body);
+
+    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+
+    //return parsedIllusts;
   }
 
   Future<void> searchUser() async {
