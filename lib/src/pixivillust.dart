@@ -19,7 +19,7 @@ class PixivIllust {
   int height;
   int sanityLevel;
   int restrictLevel;
-  String? series;
+  Map? series;
   Map jsonMetaSinglePage;
   List jsonMetaPages;
   int totalViews;
@@ -27,7 +27,7 @@ class PixivIllust {
   bool isBookmarked;
   bool isVisible;
   bool isMuted;
-  int totalComments;
+  int? totalComments;
 
   @override
   String toString() {
