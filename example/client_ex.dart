@@ -7,5 +7,7 @@ Future<void> main() async {
   await c.connect("******");
   // print(await c.getUserDetails(29431640));
   // print(await c.getUserIllusts(29431640));
-  await c.searchIllust("lmao");
+  var stuff = await c.searchIllust("fate", offset: 30, sort: "popular_desc");
+  print(stuff);
+  print(stuff.length);
 }

@@ -183,21 +183,22 @@ class PixivClient {
    - `2020-07-01`
 
   */
-  Future<void> searchIllust(
-    String word, [
+  Future<List> searchIllust(
+    String word, {
     String searchTarget = "partial_match_for_tags",
-    String sort = "date_desc",
+    String sort = "popular_desc",
     String duration = "",
     String startDate = "",
     String endDate = "",
     int offset = 0,
-  ]) async {
+  }) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "word": word,
       "search_target": searchTarget,
       "sort": sort,
       "filter": "for_ios",
+      "offset": offset.toString()
     };
 
     if (duration.isNotEmpty) {
@@ -215,11 +216,15 @@ class PixivClient {
     Uri uri = Uri.https("app-api.pixiv.net", "/v1/search/illust", body);
     var response = await httpClient.get(uri, headers: header);
 
-    print(response.body);
-
     var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
 
-    //return parsedIllusts;
+    List parsedIllusts = [];
+    List illusts = decodedResponse["illusts"];
+    for (int i = 0; i < illusts.length; i++) {
+      parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
+    }
+
+    return parsedIllusts;
   }
 
   Future<void> searchUser() async {
