@@ -1,5 +1,6 @@
 # pxdart
-[Pixiv](https://pixiv.net/) API implemented in Dart
+Pixiv API implemented in Dart.
+Inspired by [alphasp/pixiv-api-client](https://github.com/alphasp/pixiv-api-client) & [pixivpy](https://github.com/upbit/pixivpy)
 
 ## 📄 Features
  - Authentication support
@@ -9,7 +10,6 @@
  - Retrieve illust details
  - Retrieve recommended images
  - User control
- - Infinite search
 
 ## 🔧 Getting Started...
 ...
