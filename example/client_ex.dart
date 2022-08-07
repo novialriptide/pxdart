@@ -4,7 +4,7 @@ import 'dart:convert';
 
 Future<void> main() async {
   var c = PixivClient();
-  await c.connect("******");
+  await c.connect("");
   // print(await c.getUserDetails(29431640));
   // print(await c.getUserIllusts(29431640));
   var stuff = await c.searchIllust("fate", offset: 80, sort: "popular_desc");
