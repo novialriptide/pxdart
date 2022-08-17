@@ -83,7 +83,7 @@ class PixivClient {
       body: payload,
       headers: header,
     );
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+    var decodedResponse = readResponse(response.bodyBytes);
     userId = decodedResponse["user"]["id"];
     displayName = decodedResponse["user"]["name"];
     userName = decodedResponse["user"]["account"];
@@ -95,6 +95,16 @@ class PixivClient {
     isAuth = true;
   }
 
+  Map readResponse(Uint8List bytes) {
+    var decoded = jsonDecode(utf8.decode(bytes)) as Map;
+
+    if (decoded.keys.contains("error")) {
+      throw Exception(decoded.toString());
+    } else {
+      return decoded;
+    }
+  }
+
   Future<PixivUser> getUserDetails(int userId) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
@@ -104,7 +114,7 @@ class PixivClient {
 
     Uri uri = Uri.https("app-api.pixiv.net", "/v1/user/detail", body);
     var response = await httpClient.get(uri, headers: header);
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+    var decodedResponse = readResponse(response.bodyBytes);
 
     return PixivUser.fromJson(decodedResponse);
   }
@@ -118,7 +128,7 @@ class PixivClient {
 
     Uri uri = Uri.https("app-api.pixiv.net", "/v1/user/illusts", body);
     var response = await httpClient.get(uri, headers: header);
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+    var decodedResponse = readResponse(response.bodyBytes);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -162,7 +172,7 @@ class PixivClient {
     Uri uri = Uri.https("app-api.pixiv.net", "/v2/illust/related", body);
     var response = await httpClient.get(uri, headers: header);
 
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+    var decodedResponse = readResponse(response.bodyBytes);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -243,7 +253,7 @@ class PixivClient {
     Uri uri = Uri.https("app-api.pixiv.net", "/v1/search/illust", body);
     var response = await httpClient.get(uri, headers: header);
 
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+    var decodedResponse = readResponse(response.bodyBytes);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -258,9 +268,13 @@ class PixivClient {
     Map<String, String> header = getHeader();
     header["Referer"] = "https://app-api.pixiv.net/";
     String unencodedPath = url.replaceAll("https://i.pximg.net", "");
-    var response = await httpClient.get(Uri.https("i.pximg.net", unencodedPath),
-        headers: header);
-    return response.bodyBytes;
+    try {
+      var response = await httpClient
+          .get(Uri.https("i.pximg.net", unencodedPath), headers: header);
+      return response.bodyBytes;
+    } catch (e) {
+      return Uint8List.fromList([]);
+    }
   }
 
   Future<List> getPopularPreviewIllusts(String word) async {
@@ -278,7 +292,7 @@ class PixivClient {
         "app-api.pixiv.net", "/v1/search/popular-preview/illust", body);
     var response = await httpClient.get(uri, headers: header);
 
-    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes)) as Map;
+    var decodedResponse = readResponse(response.bodyBytes);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
