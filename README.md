@@ -15,5 +15,6 @@ Inspired by [alphasp/pixiv-api-client](https://github.com/alphasp/pixiv-api-clie
 ...
 
 ## 🪙 What is a "refresh token" and how do I get it?
-...
+
+https://gist.github.com/ZipFile/c9ebedb224406f4f11845ab700124362
 
