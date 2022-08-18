@@ -193,6 +193,26 @@ class PixivClient {
     throw UnimplementedError();
   }
 
+  Future<Map> getSearchAutoComplete(String word) async {
+    Map<String, String> header = getHeader();
+    Map<String, String> body = {'word': word};
+    word = Uri.encodeComponent(word);
+    var decodedResponse =
+        await httpGet("/v1/search/autocomplete", body, header);
+
+    return decodedResponse;
+  }
+
+  Future<Map> getSearchAutoCompleteV2(String word) async {
+    Map<String, String> header = getHeader();
+    Map<String, String> body = {'word': word};
+    word = Uri.encodeComponent(word);
+    var decodedResponse =
+        await httpGet("/v2/search/autocomplete", body, header);
+
+    return decodedResponse;
+  }
+
   /*
 
   Valid `searchTarget`s:
