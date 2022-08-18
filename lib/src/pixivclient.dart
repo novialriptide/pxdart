@@ -17,7 +17,6 @@ class PixivClient {
   late bool isMailAuthorized;
   late http.Client httpClient;
 
-  bool isAuth = false;
   String hosts = "app-api.pixiv.net";
   String refreshToken = "";
   String language = "English";
@@ -80,6 +79,7 @@ class PixivClient {
       headers: header,
     );
     var decodedResponse = readResponse(response.bodyBytes);
+    accessToken = decodedResponse["access_token"];
 
     return decodedResponse;
   }
