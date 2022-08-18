@@ -105,16 +105,21 @@ class PixivClient {
     }
   }
 
+  Future<Map> httpGet(
+      String path, Map<String, String> body, Map<String, String> header) async {
+    Uri uri = Uri.https("app-api.pixiv.net", path, body);
+    var response = await httpClient.get(uri, headers: header);
+    Map decodedResponse = readResponse(response.bodyBytes);
+    return decodedResponse;
+  }
+
   Future<PixivUser> getUserDetails(int userId) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "user_id": userId.toString(),
       "filter": "for_ios",
     };
-
-    Uri uri = Uri.https("app-api.pixiv.net", "/v1/user/detail", body);
-    var response = await httpClient.get(uri, headers: header);
-    var decodedResponse = readResponse(response.bodyBytes);
+    var decodedResponse = await httpGet("/v1/user/detail", body, header);
 
     return PixivUser.fromJson(decodedResponse);
   }
@@ -125,10 +130,7 @@ class PixivClient {
       "user_id": userId.toString(),
       "filter": "for_ios",
     };
-
-    Uri uri = Uri.https("app-api.pixiv.net", "/v1/user/illusts", body);
-    var response = await httpClient.get(uri, headers: header);
-    var decodedResponse = readResponse(response.bodyBytes);
+    var decodedResponse = await httpGet("/v1/user/illusts", body, header);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -168,11 +170,7 @@ class PixivClient {
     Map<String, String> body = {
       "illust_id": illustId.toString(),
     };
-
-    Uri uri = Uri.https("app-api.pixiv.net", "/v2/illust/related", body);
-    var response = await httpClient.get(uri, headers: header);
-
-    var decodedResponse = readResponse(response.bodyBytes);
+    var decodedResponse = await httpGet("/v2/illust/related", body, header);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -250,10 +248,7 @@ class PixivClient {
       body["end_date"] = endDate;
     }
 
-    Uri uri = Uri.https("app-api.pixiv.net", "/v1/search/illust", body);
-    var response = await httpClient.get(uri, headers: header);
-
-    var decodedResponse = readResponse(response.bodyBytes);
+    var decodedResponse = await httpGet("/v1/search/illust", body, header);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -287,12 +282,8 @@ class PixivClient {
       "word": word,
       "search_target": "partial_match_for_tags",
     };
-
-    Uri uri = Uri.https(
-        "app-api.pixiv.net", "/v1/search/popular-preview/illust", body);
-    var response = await httpClient.get(uri, headers: header);
-
-    var decodedResponse = readResponse(response.bodyBytes);
+    var decodedResponse =
+        await httpGet("/v1/search/popular-preview/illust", body, header);
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
