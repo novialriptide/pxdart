@@ -6,9 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
-import 'package:pxdart/src/pixivuser.dart';
-import 'package:pxdart/src/pixivillust.dart';
-
 class PixivClient {
   late String accessToken;
   late String userId;
@@ -19,8 +16,6 @@ class PixivClient {
   late int restrictLevel;
   late bool isMailAuthorized;
   late http.Client httpClient;
-  late PixivUser user;
-  late bool isUsingOriginalApi;
 
   bool isAuth = false;
   String hosts = "app-api.pixiv.net";
@@ -52,9 +47,7 @@ class PixivClient {
     return header;
   }
 
-  Future<void> connect(String refreshToken, [bool? useOriginalApi]) async {
-    isUsingOriginalApi = !(useOriginalApi == null);
-
+  Future<Map> connect(String refreshToken) async {
     Map<String, String> payload = {
       "get_secure_url": "1",
       "client_id": clientID,
@@ -88,15 +81,7 @@ class PixivClient {
     );
     var decodedResponse = readResponse(response.bodyBytes);
 
-    userId = decodedResponse["user"]["id"];
-    displayName = decodedResponse["user"]["name"];
-    userName = decodedResponse["user"]["account"];
-    accessToken = decodedResponse["access_token"];
-    emailAddress = decodedResponse["user"]["mail_address"];
-    isPremium = decodedResponse["user"]["is_premium"];
-    restrictLevel = decodedResponse["user"]["x_restrict"];
-    isMailAuthorized = decodedResponse["user"]["is_mail_authorized"];
-    isAuth = true;
+    return decodedResponse;
   }
 
   Map readResponse(Uint8List bytes) {
@@ -123,13 +108,7 @@ class PixivClient {
       "user_id": userId.toString(),
       "filter": "for_ios",
     };
-    var decodedResponse = await httpGet("/v1/user/detail", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    return {'response': PixivUser.fromJson(decodedResponse)};
+    return await httpGet("/v1/user/detail", body, header);
   }
 
   Future<Map> getUserIllusts(int userId) async {
@@ -138,19 +117,7 @@ class PixivClient {
       "user_id": userId.toString(),
       "filter": "for_ios",
     };
-    var decodedResponse = await httpGet("/v1/user/illusts", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    List parsedIllusts = [];
-    List illusts = decodedResponse["illusts"];
-    for (int i = 0; i < illusts.length; i++) {
-      parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
-    }
-
-    return {'response': parsedIllusts};
+    return await httpGet("/v1/user/illusts", body, header);
   }
 
   Future<void> getUserBookmarkedIllusts(int userId) async {
@@ -178,19 +145,7 @@ class PixivClient {
     Map<String, String> body = {
       "illust_id": illustId.toString(),
     };
-    var decodedResponse = await httpGet("/v2/illust/related", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    List parsedIllusts = [];
-    List illusts = decodedResponse["illusts"];
-    for (int i = 0; i < illusts.length; i++) {
-      parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
-    }
-
-    return {'response': parsedIllusts};
+    return await httpGet("/v2/illust/related", body, header);
   }
 
   Future<void> getIllustRecommended() async {
@@ -209,28 +164,14 @@ class PixivClient {
     Map<String, String> header = getHeader();
     Map<String, String> body = {'word': word};
     word = Uri.encodeComponent(word);
-    var decodedResponse =
-        await httpGet("/v1/search/autocomplete", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    return {'response': decodedResponse['search_auto_complete_keywords']};
+    return await httpGet("/v1/search/autocomplete", body, header);
   }
 
   Future<Map> getSearchAutoCompleteV2(String word) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {'word': word};
     word = Uri.encodeComponent(word);
-    var decodedResponse =
-        await httpGet("/v2/search/autocomplete", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    return {'response': decodedResponse['search_auto_complete_keywords']};
+    return await httpGet("/v2/search/autocomplete", body, header);
   }
 
   /*
@@ -263,10 +204,6 @@ class PixivClient {
     String endDate = "",
     int offset = 0,
   }) async {
-    if (!isAuth) {
-      return {'response': []};
-    }
-
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "word": word,
@@ -288,19 +225,7 @@ class PixivClient {
       body["end_date"] = endDate;
     }
 
-    var decodedResponse = await httpGet("/v1/search/illust", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    List parsedIllusts = [];
-    List illusts = decodedResponse["illusts"];
-    for (int i = 0; i < illusts.length; i++) {
-      parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
-    }
-
-    return {'response': parsedIllusts};
+    return await httpGet("/v1/search/illust", body, header);
   }
 
   Future<Uint8List> getIllustImageBytes(String url) async {
@@ -317,29 +242,12 @@ class PixivClient {
   }
 
   Future<Map> getPopularPreviewIllusts(String word) async {
-    if (!isAuth) {
-      return {'response': []};
-    }
-
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "word": word,
       "search_target": "partial_match_for_tags",
     };
-    var decodedResponse =
-        await httpGet("/v1/search/popular-preview/illust", body, header);
-
-    if (isUsingOriginalApi) {
-      return decodedResponse;
-    }
-
-    List parsedIllusts = [];
-    List illusts = decodedResponse["illusts"];
-    for (int i = 0; i < illusts.length; i++) {
-      parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
-    }
-
-    return {'response': parsedIllusts};
+    return await httpGet("/v1/search/popular-preview/illust", body, header);
   }
 
   Future<void> searchUser() async {
