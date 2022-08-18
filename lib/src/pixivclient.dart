@@ -117,7 +117,7 @@ class PixivClient {
     return decodedResponse;
   }
 
-  Future<PixivUser> getUserDetails(int userId) async {
+  Future<Map> getUserDetails(int userId) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "user_id": userId.toString(),
@@ -125,10 +125,14 @@ class PixivClient {
     };
     var decodedResponse = await httpGet("/v1/user/detail", body, header);
 
-    return PixivUser.fromJson(decodedResponse);
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
+
+    return {'response': PixivUser.fromJson(decodedResponse)};
   }
 
-  Future<List> getUserIllusts(int userId) async {
+  Future<Map> getUserIllusts(int userId) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "user_id": userId.toString(),
@@ -136,13 +140,17 @@ class PixivClient {
     };
     var decodedResponse = await httpGet("/v1/user/illusts", body, header);
 
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
+
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
     for (int i = 0; i < illusts.length; i++) {
       parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
     }
 
-    return parsedIllusts;
+    return {'response': parsedIllusts};
   }
 
   Future<void> getUserBookmarkedIllusts(int userId) async {
@@ -165,12 +173,16 @@ class PixivClient {
     throw UnimplementedError();
   }
 
-  Future<List> getIllustRelated(int illustId) async {
+  Future<Map> getIllustRelated(int illustId) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "illust_id": illustId.toString(),
     };
     var decodedResponse = await httpGet("/v2/illust/related", body, header);
+
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
 
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
@@ -178,7 +190,7 @@ class PixivClient {
       parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
     }
 
-    return parsedIllusts;
+    return {'response': parsedIllusts};
   }
 
   Future<void> getIllustRecommended() async {
@@ -200,7 +212,11 @@ class PixivClient {
     var decodedResponse =
         await httpGet("/v1/search/autocomplete", body, header);
 
-    return decodedResponse;
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
+
+    return {'response': decodedResponse['search_auto_complete_keywords']};
   }
 
   Future<Map> getSearchAutoCompleteV2(String word) async {
@@ -210,7 +226,11 @@ class PixivClient {
     var decodedResponse =
         await httpGet("/v2/search/autocomplete", body, header);
 
-    return decodedResponse;
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
+
+    return {'response': decodedResponse['search_auto_complete_keywords']};
   }
 
   /*
@@ -234,7 +254,7 @@ class PixivClient {
    - `2020-07-01`
 
   */
-  Future<List> searchIllust(
+  Future<Map> searchIllust(
     String word, {
     String searchTarget = "partial_match_for_tags",
     String sort = "popular_desc",
@@ -244,7 +264,7 @@ class PixivClient {
     int offset = 0,
   }) async {
     if (!isAuth) {
-      return [];
+      return {'response': []};
     }
 
     Map<String, String> header = getHeader();
@@ -270,13 +290,17 @@ class PixivClient {
 
     var decodedResponse = await httpGet("/v1/search/illust", body, header);
 
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
+
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
     for (int i = 0; i < illusts.length; i++) {
       parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
     }
 
-    return parsedIllusts;
+    return {'response': parsedIllusts};
   }
 
   Future<Uint8List> getIllustImageBytes(String url) async {
@@ -292,9 +316,9 @@ class PixivClient {
     }
   }
 
-  Future<List> getPopularPreviewIllusts(String word) async {
+  Future<Map> getPopularPreviewIllusts(String word) async {
     if (!isAuth) {
-      return [];
+      return {'response': []};
     }
 
     Map<String, String> header = getHeader();
@@ -305,13 +329,17 @@ class PixivClient {
     var decodedResponse =
         await httpGet("/v1/search/popular-preview/illust", body, header);
 
+    if (isUsingOriginalApi) {
+      return decodedResponse;
+    }
+
     List parsedIllusts = [];
     List illusts = decodedResponse["illusts"];
     for (int i = 0; i < illusts.length; i++) {
       parsedIllusts.add(PixivIllust.fromJson(illusts[i]));
     }
 
-    return parsedIllusts;
+    return {'response': parsedIllusts};
   }
 
   Future<void> searchUser() async {
