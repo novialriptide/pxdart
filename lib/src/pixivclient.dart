@@ -174,27 +174,6 @@ class PixivClient {
     return await httpGet("/v2/search/autocomplete", body, header);
   }
 
-  /*
-
-  Valid `searchTarget`s:
-   - partial_match_for_tags
-   - exact_match_for_tags
-   - title_and_caption
-
-  Valid `sort`s:
-   - date_desc
-   - date_asc
-   - popular_desc
-  
-  Valid `duration`s:
-   - within_last_day
-   - within_last_week
-   - within_last_month
-  
-  Valid `start_date` and `end_date` examples:
-   - `2020-07-01`
-
-  */
   Future<Map> searchIllust(
     String word, {
     String searchTarget = "partial_match_for_tags",
@@ -204,6 +183,24 @@ class PixivClient {
     String endDate = "",
     int offset = 0,
   }) async {
+    // Valid `searchTarget`s:
+    //  - partial_match_for_tags
+    //  - exact_match_for_tags
+    //  - title_and_caption
+    //
+    // Valid `sort`s:
+    //  - date_desc
+    //  - date_asc
+    //  - popular_desc
+    //
+    // Valid `duration`s:
+    //  - within_last_day
+    //  - within_last_week
+    //  - within_last_month
+    //
+    // Valid `start_date` and `end_date` examples:
+    //  - `2020-07-01`
+
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "word": word,
