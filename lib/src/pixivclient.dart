@@ -20,6 +20,7 @@ class PixivClient {
   late bool isMailAuthorized;
   late http.Client httpClient;
   late PixivUser user;
+  late bool isUsingOriginalApi;
 
   bool isAuth = false;
   String hosts = "app-api.pixiv.net";
@@ -51,7 +52,9 @@ class PixivClient {
     return header;
   }
 
-  Future<void> connect(String refreshToken) async {
+  Future<void> connect(String refreshToken, [bool? useOriginalApi]) async {
+    isUsingOriginalApi = !(useOriginalApi == null);
+
     Map<String, String> payload = {
       "get_secure_url": "1",
       "client_id": clientID,
@@ -84,6 +87,7 @@ class PixivClient {
       headers: header,
     );
     var decodedResponse = readResponse(response.bodyBytes);
+
     userId = decodedResponse["user"]["id"];
     displayName = decodedResponse["user"]["name"];
     userName = decodedResponse["user"]["account"];
@@ -162,10 +166,6 @@ class PixivClient {
   }
 
   Future<List> getIllustRelated(int illustId) async {
-    if (!isAuth) {
-      return [];
-    }
-
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "illust_id": illustId.toString(),
