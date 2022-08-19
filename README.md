@@ -1,4 +1,4 @@
-# pxdart
+# pxdart ![prs:welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 Pixiv API implemented in Dart.
 Inspired by [alphasp/pixiv-api-client](https://github.com/alphasp/pixiv-api-client) & [pixivpy](https://github.com/upbit/pixivpy)
 
