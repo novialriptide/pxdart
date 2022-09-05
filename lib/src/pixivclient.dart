@@ -111,10 +111,11 @@ class PixivClient {
     return await httpGet("/v1/user/detail", body, header);
   }
 
-  Future<Map> getUserIllusts(int userId) async {
+  Future<Map> getUserIllusts(int userId, {int offset = 0}) async {
     Map<String, String> header = getHeader();
     Map<String, String> body = {
       "user_id": userId.toString(),
+      "offset": offset.toString(),
       "filter": "for_ios",
     };
     return await httpGet("/v1/user/illusts", body, header);
