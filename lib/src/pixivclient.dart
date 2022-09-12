@@ -121,8 +121,13 @@ class PixivClient {
     return await httpGet("/v1/user/illusts", body, header);
   }
 
-  Future<void> getUserBookmarkedIllusts(int userId) async {
-    throw UnimplementedError();
+  Future<Map> getUserBookmarkedIllusts(int userId) async {
+    Map<String, String> header = getHeader();
+    Map<String, String> body = {
+      'user_id': userId.toString(),
+      'restrict': 'public'
+    };
+    return await httpGet("/v1/user/bookmarks/illust", body, header);
   }
 
   Future<void> getUserRelated(int userId) async {
